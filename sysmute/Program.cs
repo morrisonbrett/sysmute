@@ -56,8 +56,8 @@ namespace sysmute
     {
         public static DateTime startTime = new DateTime(1969, 2, 25, 22, 00, 00); // Date doesn't matter. 10pm
         public static DateTime endTime = new DateTime(1969, 2, 26, 9, 00, 00); // Date doesn't matter. 9am
+        public static int mouseIdleTime = 5; // Time mouse doesn't move to be considered idle in minutes
         public static readonly int SleepInterval = 1000 * 60; // Check the time every 1 minute
-        public static readonly int MouseIdleTime = 5; // Time mouse doesn't move to be considered idle in minutes
 
         private static void muteVolume()
         {
@@ -96,9 +96,22 @@ namespace sysmute
                 }
             }
 
-            Console.WriteLine($"sysmute. Program will mute system audio between {startTime.TimeOfDay} and {endTime.TimeOfDay}");
+            if (args.Length > 2 && args[2] != null)
+            {
+                try
+                {
+                    mouseIdleTime = int.Parse(args[2]);
+                }
+                catch (Exception)
+                {
+                    Console.WriteLine("Invalid mouse idle time");
+                    return;
+                }
+            }
+
+            Console.WriteLine($"sysmute. Program will mute system audio between {startTime.TimeOfDay} and {endTime.TimeOfDay} and check for mouse input every {mouseIdleTime} minutes");
             if (args.Length == 0)
-                Console.WriteLine($"To override startTime and endTime, pass in via command line. E.g. > sysmute 23:00 08:00");
+                Console.WriteLine($"To override startTime, endTime and mouseIdleTime minutes, pass in via command line. E.g. > sysmute 23:00 08:00 5");
 
             var LastX = (uint)0;
             var LastY = (uint)0;
@@ -121,7 +134,7 @@ namespace sysmute
 
                         if (!MouseIdleTimer.IsRunning)
                         {
-                            Console.WriteLine($"Starting timer to check for mouse activity every {MouseIdleTime} minutes");
+                            Console.WriteLine($"Starting timer to check for mouse activity every {mouseIdleTime} minutes");
                             MouseIdleTimer.Start();
                             LastX = CurrentX;
                             LastY = CurrentY;
@@ -130,9 +143,9 @@ namespace sysmute
                         {
                             if (CurrentX == LastX && CurrentY == LastY)
                             {
-                                if (MouseIdleTimer.Elapsed.Minutes >= MouseIdleTime)
+                                if (MouseIdleTimer.Elapsed.Minutes >= mouseIdleTime)
                                 {
-                                    Console.WriteLine($"User is idle.  Mouse hasn't moved in > {MouseIdleTime} minutes");
+                                    Console.WriteLine($"User is idle.  Mouse hasn't moved in > {mouseIdleTime} minutes");
                                     muteVolume();
                                     MouseIdleTimer.Stop();
                                 }
