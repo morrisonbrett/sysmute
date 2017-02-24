@@ -11,4 +11,5 @@ On my [desktop machine](https://www.flickr.com/photos/morrisonbrett/19799056499)
 The program will mute the volume during fixed hours.  Default time window is 10:00pm -> 8:00am.
 This can be overridden by passing in start time / end time on the command line.  For example, `> sysmute.exe 23:00 07:30`.
 
-If user manually unmutes, it stays unmuted.
+The program also detects mouse movement. If mouse is active, it won't mute.  If mouse is idle for > 5 minutes, it will mute.
+This ensures that during "quiet hours", you must move your mouse at least once every 5 minutes or the audio will mute.

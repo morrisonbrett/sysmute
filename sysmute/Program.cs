@@ -5,7 +5,7 @@ using System.Windows.Forms;
 
 namespace sysmute
 {
-    static class DateTimeExt
+    internal static class DateTimeExt
     {
         // DateTime extention to easily compare 2 times
         // http://stackoverflow.com/questions/10631044/c-sharp-compare-time-between-two-time-intervals
@@ -29,7 +29,7 @@ namespace sysmute
 
                 return hour;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Console.WriteLine($"Invalid hour {timeString}.  Must use HH:MM");
                 throw e;
@@ -52,19 +52,22 @@ namespace sysmute
         }
     }
 
-    class Program
+    internal class Program
     {
         public static DateTime startTime = new DateTime(1969, 2, 25, 22, 00, 00); // Date doesn't matter. 10pm
         public static DateTime endTime = new DateTime(1969, 2, 26, 9, 00, 00); // Date doesn't matter. 9am
         public static readonly int SleepInterval = 1000 * 60; // Check the time every 1 minute
+        public static readonly int MouseIdleTime = 5; // Time mouse doesn't move to be considered idle in minutes
 
-        // ReMute Variables
-        public static Stopwatch ReMuteTime = new Stopwatch();
-        public static readonly int ReMuteInterval = 5; // Check the time every X minutes after leaving computer
-        public static uint CursorX;
-        public static uint CursorY;
+        private static void muteVolume()
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("Muting Master Volume");
+            Console.ForegroundColor = ConsoleColor.White;
+            AudioManager.SetMasterVolumeMute(true);
+        }
 
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             // Check the command args.  If set, override the default
             if (args.Length > 0 && args[0] != null)
@@ -97,69 +100,63 @@ namespace sysmute
             if (args.Length == 0)
                 Console.WriteLine($"To override startTime and endTime, pass in via command line. E.g. > sysmute 23:00 08:00");
 
-            var needToMute = true; // Controls to not mute if already muted.
-            
-            uint X; // Store Mouse X Coordinate
-            uint Y; // Store Mouse Y Coordinate
+            var LastX = (uint)0;
+            var LastY = (uint)0;
+            var MouseIdleTimer = new Stopwatch();
 
             while (true)
             {
                 var timeNow = DateTime.Now;
                 Console.WriteLine($"Current Time: {timeNow.TimeOfDay}");
 
-                // If the current time falls within the range of the quite time, mute
-                // If user unmutes during restricted time, it will re-mute after a period of time
-
+                // If the current time falls within the range of the quiet time, mute
+                // If user unmutes during quiet time, it will re-mute after a period of idle time
                 if (timeNow.TimeOfDayIsBetween(startTime, endTime))
                 {
-                    if (needToMute)
-                    {
-                        Console.WriteLine("Muting Master Volume");
-                        AudioManager.SetMasterVolumeMute(true);
-                        needToMute = false;
-                    }
-
-                    // Check if still muted and user leaves computer
+                    // Audio isn't muted, check mouse for idle to ensure we want to mute
                     if (!AudioManager.GetMasterVolumeMute())
                     {
+                        var CurrentX = (uint)Cursor.Position.X;
+                        var CurrentY = (uint)Cursor.Position.Y;
 
-                        X = (uint)Cursor.Position.X;
-                        Y = (uint)Cursor.Position.Y;
-
-                        if (!ReMuteTime.IsRunning)
+                        if (!MouseIdleTimer.IsRunning)
                         {
-                            ReMuteTime.Start();
-                            CursorX = X;
-                            CursorY = Y;
+                            Console.WriteLine($"Starting timer to check for mouse activity every {MouseIdleTime} minutes");
+                            MouseIdleTimer.Start();
+                            LastX = CurrentX;
+                            LastY = CurrentY;
                         }
                         else
                         {
-                            if (CursorX == X && CursorY == Y)
+                            if (CurrentX == LastX && CurrentY == LastY)
                             {
-                                if (ReMuteTime.Elapsed.Minutes >= ReMuteInterval)
+                                if (MouseIdleTimer.Elapsed.Minutes >= MouseIdleTime)
                                 {
-                                    Console.ForegroundColor = ConsoleColor.Red;
-                                    Console.WriteLine("Muting Master Volume");
-                                    Console.ForegroundColor = ConsoleColor.White;
-                                    AudioManager.SetMasterVolumeMute(true);
-                                    ReMuteTime.Stop();
+                                    Console.WriteLine($"User is idle.  Mouse hasn't moved in > {MouseIdleTime} minutes");
+                                    muteVolume();
+                                    MouseIdleTimer.Stop();
                                 }
                             }
                             else
                             {
                                 Console.ForegroundColor = ConsoleColor.Green;
-                                Console.WriteLine("Detected Movement -> Resetting Time and Coordinates.");
+                                Console.WriteLine("Detected Movement -> Restarting idle mouse timer and coordinates.");
                                 Console.ForegroundColor = ConsoleColor.White;
-                                ReMuteTime.Restart();
-                                CursorX = X;
-                                CursorY = Y;
+                                MouseIdleTimer.Restart();
+                                LastX = CurrentX;
+                                LastY = CurrentY;
                             }
                         }
                     }
-                }
-                else
-                {
-                    needToMute = true; // This resets each day, once it's out of the restricted range
+                    else
+                    {
+                        // Edge condition. Sound is muted, just check and ensure the mouse idle timer resets properly
+                        if (MouseIdleTimer.IsRunning)
+                        {
+                            Console.WriteLine("Stopping idle mouse timer.");
+                            MouseIdleTimer.Stop();
+                        }
+                    }
                 }
 
                 Thread.Sleep(SleepInterval);
