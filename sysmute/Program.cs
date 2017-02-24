@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading;
+using System.Windows.Forms;
 
 namespace sysmute
 {
@@ -56,6 +58,12 @@ namespace sysmute
         public static DateTime endTime = new DateTime(1969, 2, 26, 9, 00, 00); // Date doesn't matter. 9am
         public static readonly int SleepInterval = 1000 * 60; // Check the time every 1 minute
 
+        // ReMute Variables
+        public static Stopwatch ReMuteTime = new Stopwatch();
+        public static readonly int ReMuteInterval = 5; // Check the time every X minutes after leaving computer
+        public static uint CursorX;
+        public static uint CursorY;
+
         static void Main(string[] args)
         {
             // Check the command args.  If set, override the default
@@ -90,6 +98,9 @@ namespace sysmute
                 Console.WriteLine($"To override startTime and endTime, pass in via command line. E.g. > sysmute 23:00 08:00");
 
             var needToMute = true; // Controls to not mute if already muted.
+            
+            uint X; // Store Mouse X Coordinate
+            uint Y; // Store Mouse Y Coordinate
 
             while (true)
             {
@@ -97,7 +108,8 @@ namespace sysmute
                 Console.WriteLine($"Current Time: {timeNow.TimeOfDay}");
 
                 // If the current time falls within the range of the quite time, mute
-                // If user unmutes during restricted time, it's up to them to remember to remute manually
+                // If user unmutes during restricted time, it will re-mute after a period of time
+
                 if (timeNow.TimeOfDayIsBetween(startTime, endTime))
                 {
                     if (needToMute)
@@ -105,6 +117,44 @@ namespace sysmute
                         Console.WriteLine("Muting Master Volume");
                         AudioManager.SetMasterVolumeMute(true);
                         needToMute = false;
+                    }
+
+                    // Check if still muted and user leaves computer
+                    if (!AudioManager.GetMasterVolumeMute())
+                    {
+
+                        X = (uint)Cursor.Position.X;
+                        Y = (uint)Cursor.Position.Y;
+
+                        if (!ReMuteTime.IsRunning)
+                        {
+                            ReMuteTime.Start();
+                            CursorX = X;
+                            CursorY = Y;
+                        }
+                        else
+                        {
+                            if (CursorX == X && CursorY == Y)
+                            {
+                                if (ReMuteTime.Elapsed.Minutes >= ReMuteInterval)
+                                {
+                                    Console.ForegroundColor = ConsoleColor.Red;
+                                    Console.WriteLine("Muting Master Volume");
+                                    Console.ForegroundColor = ConsoleColor.White;
+                                    AudioManager.SetMasterVolumeMute(true);
+                                    ReMuteTime.Stop();
+                                }
+                            }
+                            else
+                            {
+                                Console.ForegroundColor = ConsoleColor.Green;
+                                Console.WriteLine("Detected Movement -> Resetting Time and Coordinates.");
+                                Console.ForegroundColor = ConsoleColor.White;
+                                ReMuteTime.Restart();
+                                CursorX = X;
+                                CursorY = Y;
+                            }
+                        }
                     }
                 }
                 else
