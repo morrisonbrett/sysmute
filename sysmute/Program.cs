@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Drawing;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -67,6 +68,55 @@ namespace sysmute
             AudioManager.SetMasterVolumeMute(true);
         }
 
+        private static void unmuteVolume()
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("Unmuting Master Volume");
+            Console.ForegroundColor = ConsoleColor.White;
+            AudioManager.SetMasterVolumeMute(false);
+        }
+
+        public static void AddSystemIcon()
+        {
+            // Try to add notifications
+            Thread notifyThread = new Thread(
+                delegate()
+                {
+                    NotifyIcon trayIcon = new NotifyIcon();
+                    trayIcon.Text = "Sysmute";
+                    trayIcon.Icon = new Icon(SystemIcons.Application, 40, 40);
+
+                    ContextMenu trayMenu = new ContextMenu();
+
+                    trayMenu.MenuItems.Add("&Mute", (sender, eventArgs) =>
+                    {
+                        muteVolume();
+                    });
+
+                    trayMenu.MenuItems.Add("&Unmute", (sender, eventArgs) =>
+                    {
+                        unmuteVolume();
+                    });
+
+                    trayMenu.MenuItems.Add("-", (sender, eventArgs) =>
+                    {
+                        unmuteVolume();
+                    });
+
+                    trayMenu.MenuItems.Add("&About", (sender, eventArgs) =>
+                    {
+                        Process.Start("https://brettmorrison.com/");
+                    });
+
+                    trayIcon.ContextMenu = trayMenu;
+                    trayIcon.Visible = true;
+                    Application.Run();
+                    Console.WriteLine("Done");
+                });
+
+            notifyThread.Start();
+        }
+
         private static void Main(string[] args)
         {
             // Check the command args.  If set, override the default
@@ -108,6 +158,9 @@ namespace sysmute
                     return;
                 }
             }
+
+            // Add System Icon
+            AddSystemIcon();
 
             Console.WriteLine($"sysmute. Program will mute system audio between {startTime.TimeOfDay} and {endTime.TimeOfDay} and check for mouse input every {mouseIdleTime} minutes");
             if (args.Length == 0)
