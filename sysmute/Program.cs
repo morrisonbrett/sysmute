@@ -80,7 +80,7 @@ namespace sysmute
         {
             // Try to add notifications
             Thread notifyThread = new Thread(
-                delegate()
+                delegate ()
                 {
                     NotifyIcon trayIcon = new NotifyIcon();
                     trayIcon.Text = "Sysmute";
@@ -98,14 +98,18 @@ namespace sysmute
                         unmuteVolume();
                     });
 
-                    trayMenu.MenuItems.Add("-", (sender, eventArgs) =>
-                    {
-                        unmuteVolume();
-                    });
+                    trayMenu.MenuItems.Add("-", (sender, eventArgs) => { });
 
                     trayMenu.MenuItems.Add("&About", (sender, eventArgs) =>
                     {
-                        Process.Start("https://brettmorrison.com/");
+                        Process.Start("https://github.com/morrisonbrett/sysmute");
+                    });
+
+                    trayMenu.MenuItems.Add("-", (sender, eventArgs) => { });
+
+                    trayMenu.MenuItems.Add("E&xit", (sender, eventArgs) =>
+                    {
+                        Environment.Exit(0);
                     });
 
                     trayIcon.ContextMenu = trayMenu;
