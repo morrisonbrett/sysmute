@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Drawing;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -67,6 +68,14 @@ namespace sysmute
             AudioManager.SetMasterVolumeMute(true);
         }
 
+        private static void unmuteVolume()
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("Unmuting Master Volume");
+            Console.ForegroundColor = ConsoleColor.White;
+            AudioManager.SetMasterVolumeMute(false);
+        }
+
         private static void Main(string[] args)
         {
             // Check the command args.  If set, override the default
@@ -116,6 +125,38 @@ namespace sysmute
             var LastX = (uint)0;
             var LastY = (uint)0;
             var MouseIdleTimer = new Stopwatch();
+
+
+            // Try to add notifications
+            NotifyIcon trayIcon = new NotifyIcon();
+            trayIcon.Text = "Sysmute";
+            trayIcon.Icon = new Icon(SystemIcons.Application, 40, 40);
+
+            ContextMenu trayMenu = new ContextMenu();
+
+           trayMenu.MenuItems.Add("&Mute", (sender, eventArgs) =>
+           {
+               muteVolume();
+           });
+
+            trayMenu.MenuItems.Add("&Unmute", (sender, eventArgs) =>
+            {
+                unmuteVolume();
+            });
+
+            trayMenu.MenuItems.Add("-", (sender, eventArgs) =>
+            {
+                unmuteVolume();
+            });
+
+            trayMenu.MenuItems.Add("&About", (sender, eventArgs) =>
+            {
+                Process.Start("https://brettmorrison.com/");
+            });
+
+            trayIcon.ContextMenu = trayMenu;
+            trayIcon.Visible = true;
+            Application.Run();
 
             while (true)
             {
