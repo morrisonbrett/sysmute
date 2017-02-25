@@ -59,6 +59,7 @@ namespace sysmute
         public static DateTime endTime = new DateTime(1969, 2, 26, 9, 00, 00); // Date doesn't matter. 9am
         public static int mouseIdleTime = 5; // Time mouse doesn't move to be considered idle in minutes
         public static readonly int SleepInterval = 1000 * 60; // Check the time every 1 minute
+        public static readonly string ProjectUrl = "https://github.com/morrisonbrett/sysmute";
 
         private static void muteVolume()
         {
@@ -102,7 +103,7 @@ namespace sysmute
 
                     trayMenu.MenuItems.Add("&About", (sender, eventArgs) =>
                     {
-                        Process.Start("https://github.com/morrisonbrett/sysmute");
+                        Process.Start(ProjectUrl);
                     });
 
                     trayMenu.MenuItems.Add("-", (sender, eventArgs) => { });
@@ -115,7 +116,6 @@ namespace sysmute
                     trayIcon.ContextMenu = trayMenu;
                     trayIcon.Visible = true;
                     Application.Run();
-                    Console.WriteLine("Done");
                 });
 
             notifyThread.Start();
