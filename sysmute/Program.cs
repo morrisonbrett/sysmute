@@ -52,14 +52,14 @@ namespace sysmute
                         unmuteVolume();
                     });
 
-                    trayMenu.MenuItems.Add("-", (sender, eventArgs) => { });
+                    trayMenu.MenuItems.Add("-");
 
                     trayMenu.MenuItems.Add("&About", (sender, eventArgs) =>
                     {
                         Process.Start(ProjectUrl);
                     });
 
-                    trayMenu.MenuItems.Add("-", (sender, eventArgs) => { });
+                    trayMenu.MenuItems.Add("-");
 
                     trayMenu.MenuItems.Add("E&xit", (sender, eventArgs) =>
                     {
