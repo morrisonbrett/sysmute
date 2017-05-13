@@ -8,8 +8,17 @@ namespace sysmute
 {
     internal class Program
     {
-        public static DateTime startTime = new DateTime(1969, 2, 25, 22, 00, 00); // Date doesn't matter. 10pm
-        public static DateTime endTime = new DateTime(1969, 2, 26, 9, 00, 00); // Date doesn't matter. 9am
+        public static int DefaultYear = 1969;
+        public static int DefaultMonth = 2;
+        public static int DefaultStartDay = 25;
+        public static int DefaultEndDay = 26;
+        public static int DefaultStartHour = 22;
+        public static int DefaultEndHour = 9;
+        public static int ExampleStartHour = 23;
+        public static int ExampleEndHour = 8;
+        public static int ExampleMouseIdleMinutes = 5;
+        public static DateTime startTime = new DateTime(DefaultYear, DefaultMonth, DefaultStartDay, DefaultStartHour, 00, 00); // Date doesn't matter. 10pm
+        public static DateTime endTime = new DateTime(DefaultYear, DefaultMonth, DefaultEndDay, DefaultEndHour, 00, 00); // Date doesn't matter. 9am
         public static int mouseIdleTime = 5; // Time mouse doesn't move to be considered idle in minutes
         public static readonly int SleepInterval = 1000 * 60; // Check the time every 1 minute
         public static readonly string ProjectUrl = "https://github.com/morrisonbrett/sysmute";
@@ -81,7 +90,7 @@ namespace sysmute
             {
                 try
                 {
-                    startTime = new DateTime(1969, 2, 25, args[0].Hour(), args[0].Minute(), 00);
+                    startTime = new DateTime(DefaultYear, DefaultMonth, DefaultStartDay, args[0].Hour(), args[0].Minute(), 00);
                 }
                 catch (Exception)
                 {
@@ -94,7 +103,7 @@ namespace sysmute
             {
                 try
                 {
-                    endTime = new DateTime(1969, 2, 26, args[1].Hour(), args[1].Minute(), 00);
+                    endTime = new DateTime(DefaultYear, DefaultMonth, DefaultEndDay, args[1].Hour(), args[1].Minute(), 00);
                 }
                 catch (Exception)
                 {
@@ -121,7 +130,7 @@ namespace sysmute
 
             Console.WriteLine($"sysmute. Program will mute system audio between {startTime.TimeOfDay} and {endTime.TimeOfDay} and check for mouse input every {mouseIdleTime} minutes");
             if (args.Length == 0)
-                Console.WriteLine($"To override startTime, endTime and mouseIdleTime minutes, pass in via command line. E.g. > sysmute 23:00 08:00 5");
+                Console.WriteLine($"To override startTime, endTime and mouseIdleTime minutes, pass in via command line. E.g. > sysmute {ExampleStartHour}:00 {ExampleEndHour}:00 {ExampleMouseIdleMinutes}");
 
             var LastX = (uint)0;
             var LastY = (uint)0;
