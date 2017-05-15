@@ -48,7 +48,7 @@ namespace sysmute
                     NotifyIcon trayIcon = new NotifyIcon()
                     {
                         Text = "Sysmute",
-                        Icon = new Icon(SystemIcons.Application, 40, 40)
+                        Icon = new Icon(Resource.sysmute, 40, 40)
                     };
                     ContextMenu trayMenu = new ContextMenu();
 
