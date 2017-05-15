@@ -25,17 +25,13 @@ namespace sysmute
 
         private static void MuteVolume()
         {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("Muting Master Volume");
-            Console.ForegroundColor = ConsoleColor.White;
+            Debug.WriteLine("Muting Master Volume");
             AudioManager.SetMasterVolumeMute(true);
         }
 
         private static void UnmuteVolume()
         {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("Unmuting Master Volume");
-            Console.ForegroundColor = ConsoleColor.White;
+            Debug.WriteLine("Unmuting Master Volume");
             AudioManager.SetMasterVolumeMute(false);
         }
 
@@ -95,7 +91,7 @@ namespace sysmute
                 }
                 catch (Exception)
                 {
-                    Console.WriteLine("Invalid start time");
+                    Debug.WriteLine("Invalid start time");
                     return;
                 }
             }
@@ -108,7 +104,7 @@ namespace sysmute
                 }
                 catch (Exception)
                 {
-                    Console.WriteLine("Invalid end time");
+                    Debug.WriteLine("Invalid end time");
                     return;
                 }
             }
@@ -121,7 +117,7 @@ namespace sysmute
                 }
                 catch (Exception)
                 {
-                    Console.WriteLine("Invalid mouse idle time");
+                    Debug.WriteLine("Invalid mouse idle time");
                     return;
                 }
             }
@@ -129,9 +125,9 @@ namespace sysmute
             // Add System Icon
             AddSystemIcon();
 
-            Console.WriteLine($"sysmute. Program will mute system audio between {startTime.TimeOfDay} and {endTime.TimeOfDay} and check for mouse input every {mouseIdleTime} minutes");
+            Debug.WriteLine($"sysmute. Program will mute system audio between {startTime.TimeOfDay} and {endTime.TimeOfDay} and check for mouse input every {mouseIdleTime} minutes");
             if (args.Length == 0)
-                Console.WriteLine($"To override startTime, endTime and mouseIdleTime minutes, pass in via command line. E.g. > sysmute {ExampleStartHour}:00 {ExampleEndHour}:00 {ExampleMouseIdleMinutes}");
+                Debug.WriteLine($"To override startTime, endTime and mouseIdleTime minutes, pass in via command line. E.g. > sysmute {ExampleStartHour}:00 {ExampleEndHour}:00 {ExampleMouseIdleMinutes}");
 
             var LastX = (uint)0;
             var LastY = (uint)0;
@@ -140,7 +136,7 @@ namespace sysmute
             while (true)
             {
                 var timeNow = DateTime.Now;
-                Console.WriteLine($"Current Time: {timeNow.TimeOfDay}");
+                Debug.WriteLine($"Current Time: {timeNow.TimeOfDay}");
 
                 // If the current time falls within the range of the quiet time, mute
                 // If user unmutes during quiet time, it will re-mute after a period of idle time
@@ -154,7 +150,7 @@ namespace sysmute
 
                         if (!MouseIdleTimer.IsRunning)
                         {
-                            Console.WriteLine($"Starting timer to check for mouse activity every {mouseIdleTime} minutes");
+                            Debug.WriteLine($"Starting timer to check for mouse activity every {mouseIdleTime} minutes");
                             MouseIdleTimer.Start();
                             LastX = CurrentX;
                             LastY = CurrentY;
@@ -165,16 +161,14 @@ namespace sysmute
                             {
                                 if (MouseIdleTimer.Elapsed.Minutes >= mouseIdleTime)
                                 {
-                                    Console.WriteLine($"User is idle.  Mouse hasn't moved in > {mouseIdleTime} minutes");
+                                    Debug.WriteLine($"User is idle.  Mouse hasn't moved in > {mouseIdleTime} minutes");
                                     MuteVolume();
                                     MouseIdleTimer.Stop();
                                 }
                             }
                             else
                             {
-                                Console.ForegroundColor = ConsoleColor.Green;
-                                Console.WriteLine("Detected Movement -> Restarting idle mouse timer and coordinates.");
-                                Console.ForegroundColor = ConsoleColor.White;
+                                Debug.WriteLine("Detected Movement -> Restarting idle mouse timer and coordinates.");
                                 MouseIdleTimer.Restart();
                                 LastX = CurrentX;
                                 LastY = CurrentY;
@@ -186,7 +180,7 @@ namespace sysmute
                         // Edge condition. Sound is muted, just check and ensure the mouse idle timer resets properly
                         if (MouseIdleTimer.IsRunning)
                         {
-                            Console.WriteLine("Stopping idle mouse timer.");
+                            Debug.WriteLine("Stopping idle mouse timer.");
                             MouseIdleTimer.Stop();
                         }
                     }
