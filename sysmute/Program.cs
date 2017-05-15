@@ -23,7 +23,7 @@ namespace sysmute
         public static readonly int SleepInterval = 1000 * 60; // Check the time every 1 minute
         public static readonly string ProjectUrl = "https://github.com/morrisonbrett/sysmute";
 
-        private static void muteVolume()
+        private static void MuteVolume()
         {
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine("Muting Master Volume");
@@ -31,7 +31,7 @@ namespace sysmute
             AudioManager.SetMasterVolumeMute(true);
         }
 
-        private static void unmuteVolume()
+        private static void UnmuteVolume()
         {
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine("Unmuting Master Volume");
@@ -45,20 +45,21 @@ namespace sysmute
             Thread notifyThread = new Thread(
                 delegate ()
                 {
-                    NotifyIcon trayIcon = new NotifyIcon();
-                    trayIcon.Text = "Sysmute";
-                    trayIcon.Icon = new Icon(SystemIcons.Application, 40, 40);
-
+                    NotifyIcon trayIcon = new NotifyIcon()
+                    {
+                        Text = "Sysmute",
+                        Icon = new Icon(SystemIcons.Application, 40, 40)
+                    };
                     ContextMenu trayMenu = new ContextMenu();
 
                     trayMenu.MenuItems.Add("&Mute", (sender, eventArgs) =>
                     {
-                        muteVolume();
+                        MuteVolume();
                     });
 
                     trayMenu.MenuItems.Add("&Unmute", (sender, eventArgs) =>
                     {
-                        unmuteVolume();
+                        UnmuteVolume();
                     });
 
                     trayMenu.MenuItems.Add("-");
@@ -165,7 +166,7 @@ namespace sysmute
                                 if (MouseIdleTimer.Elapsed.Minutes >= mouseIdleTime)
                                 {
                                     Console.WriteLine($"User is idle.  Mouse hasn't moved in > {mouseIdleTime} minutes");
-                                    muteVolume();
+                                    MuteVolume();
                                     MouseIdleTimer.Stop();
                                 }
                             }
