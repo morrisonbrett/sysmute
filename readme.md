@@ -1,5 +1,7 @@
 ## sysmute
 
+[![Total alerts](https://img.shields.io/lgtm/alerts/g/morrisonbrett/sysmute.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/morrisonbrett/sysmute/alerts/)
+
 This program was built to silence the volume during a window of sleeping hours.
 It came about because I would forget to turn the speakers off or mute at night,
 and during the quietness of the night, alerts arriving in throughout the night with audible alerts

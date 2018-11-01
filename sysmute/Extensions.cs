@@ -26,10 +26,10 @@ namespace sysmute
 
                 return hour;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 Console.WriteLine($"Invalid hour {timeString}.  Must use HH:MM");
-                throw e;
+                throw;
             }
         }
 
@@ -41,10 +41,10 @@ namespace sysmute
 
                 return minute;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 Console.WriteLine($"Invalid minute {timeString}.  Must use HH:MM");
-                throw e;
+                throw;
             }
         }
     }
