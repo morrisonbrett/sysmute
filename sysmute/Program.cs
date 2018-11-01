@@ -41,40 +41,39 @@ namespace sysmute
             Thread notifyThread = new Thread(
                 delegate ()
                 {
-                    NotifyIcon trayIcon = new NotifyIcon()
+                    using (NotifyIcon trayIcon = new NotifyIcon() { Text = "Sysmute", Icon = new Icon(Resource.sysmute, 40, 40) })
                     {
-                        Text = "Sysmute",
-                        Icon = new Icon(Resource.sysmute, 40, 40)
-                    };
-                    ContextMenu trayMenu = new ContextMenu();
+                        using (ContextMenu trayMenu = new ContextMenu())
+                        {
+                            trayMenu.MenuItems.Add("&Mute", (sender, eventArgs) =>
+                            {
+                                MuteVolume();
+                            });
 
-                    trayMenu.MenuItems.Add("&Mute", (sender, eventArgs) =>
-                    {
-                        MuteVolume();
-                    });
+                            trayMenu.MenuItems.Add("&Unmute", (sender, eventArgs) =>
+                            {
+                                UnmuteVolume();
+                            });
 
-                    trayMenu.MenuItems.Add("&Unmute", (sender, eventArgs) =>
-                    {
-                        UnmuteVolume();
-                    });
+                            trayMenu.MenuItems.Add("-");
 
-                    trayMenu.MenuItems.Add("-");
+                            trayMenu.MenuItems.Add("&About", (sender, eventArgs) =>
+                            {
+                                Process.Start(ProjectUrl);
+                            });
 
-                    trayMenu.MenuItems.Add("&About", (sender, eventArgs) =>
-                    {
-                        Process.Start(ProjectUrl);
-                    });
+                            trayMenu.MenuItems.Add("-");
 
-                    trayMenu.MenuItems.Add("-");
+                            trayMenu.MenuItems.Add("E&xit", (sender, eventArgs) =>
+                            {
+                                Environment.Exit(0);
+                            });
 
-                    trayMenu.MenuItems.Add("E&xit", (sender, eventArgs) =>
-                    {
-                        Environment.Exit(0);
-                    });
-
-                    trayIcon.ContextMenu = trayMenu;
-                    trayIcon.Visible = true;
-                    Application.Run();
+                            trayIcon.ContextMenu = trayMenu;
+                            trayIcon.Visible = true;
+                            Application.Run();
+                        }
+                    }
                 });
 
             notifyThread.Start();
