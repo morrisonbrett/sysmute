@@ -4,7 +4,7 @@ namespace sysmute
 {
     internal static class DateTimeExt
     {
-        // DateTime extention to easily compare 2 times
+        // DateTime extension to easily compare 2 times
         // http://stackoverflow.com/questions/10631044/c-sharp-compare-time-between-two-time-intervals
         public static bool TimeOfDayIsBetween(this DateTime t, DateTime start, DateTime end)
         {
